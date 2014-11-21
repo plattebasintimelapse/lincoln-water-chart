@@ -1,6 +1,8 @@
 'use strict';
 
-$(function () {
+$(function() {
+
+  console.log('drawing!');
 
     var margin = {top:100, right: 0, bottom: 30, left: 70},
         width = parseInt(d3.select("#chart").style("width")) - margin.left - margin.right,
@@ -33,8 +35,8 @@ $(function () {
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     svg.append("foreignObject")
-    .attr("width", 400)
-    .attr("height", 100)
+      .attr("width", 400)
+      .attr("height", 100)
       .attr("class", "y label")
       .attr("text-anchor", "middle")
       .attr("x", -height)
@@ -44,6 +46,14 @@ $(function () {
       .html("Seasonal Water Use <span style='font-size: 10px;'>(in Millions of Gallons)</span>");
 
     var legend;
+
+    var tip0 = d3.tip()
+      .attr('class', 'd3-tip')
+      .offset([-10, 0])
+      .direction('n')
+      .html(function(d) { return d.value + " Mgal"; });
+
+    svg.call(tip0);
 
     d3.csv("data/usage.csv", function(error, data) {
       var seasonNames = d3.keys(data[0]).filter(function(key) { return key !== "Year"; });
@@ -74,12 +84,14 @@ $(function () {
       year.selectAll("rect")
           .data(function(d) { return d.seasons; })
         .enter().append("rect")
-          .attr("class", function(d) { return d.season; })
+          .attr("class", function(d) { return d.season + " rect"; })
           .attr("width", x0b.rangeBand())
           .attr("x", function(d) { return x0b(d.season); })
           .attr("y", height)
           .attr("height", 0)
           .style("fill", function(d) { return color(d.season); })
+          .on('mouseover', tip0.show)
+          .on('mouseout', tip0.hide)
           .transition().delay(function (d,i){ return i * 800;})
           .duration(500)
           .attr("y", function(d) { return y0(d.value); })
@@ -131,7 +143,7 @@ $(function () {
     //   .attr("transform", "rotate(-90)")
     //   .text("Total Flows in cubic feet per second");
 
-    
+    var line;
 
     d3.csv("data/flows.csv", function(error, data) {
 
@@ -154,7 +166,7 @@ $(function () {
       //     .attr("class", "y axis")
       //     .call(y1Axis);
 
-      var line = d3.svg.line()
+      line = d3.svg.line()
         .interpolate("basis")
         .x(function(d) { return x1(d.date); })
         .y(function(d) { return y1(d.flow); });
@@ -204,12 +216,6 @@ $(function () {
           .text('Flow Rates near Ashland NE');
 
     });
-
-    function resize() {
-      width = parseInt(d3.select("#chart").style("width")) - margin.left - margin.right;
-    }
-
-    d3.select(window).on('resize', resize);
 
     d3.selection.prototype.moveToFront = function() {
         return this.each(function(){
