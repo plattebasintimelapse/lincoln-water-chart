@@ -1,0 +1,97 @@
+$icon-font-path: "/bower_components/bootstrap-sass-official/vendor/assets/fonts/bootstrap/";
+
+// bower:scss
+@import "../../bower_components/bootstrap-sass-official/vendor/assets/stylesheets/bootstrap.scss";
+// endbower
+
+@import url(http://fonts.googleapis.com/css?family=PT+Sans);
+
+.browsehappy {
+    margin: 0.2em 0;
+    background: #ccc;
+    color: #000;
+    padding: 0.2em 0;
+}
+
+body {
+  margin-top: 30px;
+  font-family: 'Proxima Nova', sans-serif;
+}
+
+h1 {
+  text-align: center;
+  margin: 0 auto;
+  width: 80%;
+  margin-bottom: 15px;
+}
+
+p.desc {
+  font-size: 18px;
+  margin: 0 0 8px 25px;
+  text-align: left;
+}
+
+p.desc.last{
+  margin-right: 250px;
+  margin-bottom:-60px;
+}
+
+#chart {
+    height: 600px;
+    font-size: 15px;
+    font-family: 'Proxima Nova', sans-serif !important;
+
+
+    .label body {
+      font-size: 16px;
+      font-family: 'Proxima Nova', sans-serif;
+      margin-top: 0px;
+    }
+
+    .axis path,
+    .axis line {
+      fill: none;
+      stroke: #ededed;
+      shape-rendering: crispEdges;
+    }
+
+    .x.axis path, .y.axis path {
+      display: none;
+      font-size: 16px;
+    }
+
+    .x.axis line {
+      display: none;
+    }
+
+    .year:hover {
+        fill: steelblue;
+    }
+}
+
+.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 3px;
+}
+
+.legend-flows {
+  display:none;
+
+}
+.legend-flows-2 {
+    display:inline;
+  }
+
+.credit {
+  color:gray;
+  font-size: 12px;
+  font-style: italic;
+  margin-right: 15px;
+  text-align: right;
+
+  a:hover {
+    color:black;
+    text-decoration: none;
+  }
+}

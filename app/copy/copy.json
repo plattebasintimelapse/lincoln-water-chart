@@ -1,0 +1,19 @@
+{
+	"main": {
+		"title": "Water Usage & Flows in the Platte",
+		"credits": ""
+	},
+
+
+	"description": {
+		"grafs": [
+			{ "graf":
+				"Each summer, water use increases in Lincoln, as residents turn on lawn sprinklers and cool off in warmer weather. Despite drought, water usage rates skyrocket, particulary in the 2002 and 2012 droughts.",
+			  "class":"desc"
+			},{ "graf":
+				"Notice the consistency in winter rates and a slight decline, despite a growing Lincoln population. Notice the consistency in winter rates and a slight decline, despite a growing Lincoln population.",
+				"class":"desc last"
+			}
+		]
+	}
+}
