@@ -27,13 +27,16 @@ h1 {
 
 p.desc {
   font-size: 18px;
-  margin: 0 0 8px 25px;
-  text-align: left;
+  margin: 0 6px 8px 25px;
+  text-align: justify;
 }
 
 p.desc.last{
-  margin-right: 250px;
-  margin-bottom:-60px;
+  margin-right: 350px;
+  margin-bottom:-90px;
+  @media (max-width: 700px) {
+      margin-right: 280px;
+  }
 }
 
 #chart {
@@ -127,4 +130,8 @@ p.desc.last{
   margin: -1px 0 0 0;
   top: 100%;
   left: 0;
+}
+
+.row:last-child {
+  margin-bottom: 50px;
 }

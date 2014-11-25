@@ -2,9 +2,12 @@
 
 $(function() {
 
-  console.log('drawing!');
+  function drawGraphic() {
 
-    var margin = {top:100, right: 0, bottom: 30, left: 70},
+    // clear existing graphic
+    $('#chart svg').remove();
+
+    var margin = {top:130, right: 60, bottom: 30, left: 65},
         width = parseInt(d3.select("#chart").style("width")) - margin.left - margin.right,
         height = parseInt(d3.select("#chart").style("height")) - margin.top - margin.bottom;
 
@@ -12,7 +15,7 @@ $(function() {
         .range(['rgb(254,153,41)','rgb(236,112,20)']);
 
     var x0a = d3.scale.ordinal()
-        .rangeRoundBands([0, width], .3);
+        .rangeRoundBands([0, width], .2);
 
     var x0b = d3.scale.ordinal();
 
@@ -21,6 +24,7 @@ $(function() {
 
     var x0Axis = d3.svg.axis()
         .scale(x0a)
+        .ticks(6)
         .orient("bottom");
 
     var y0Axis = d3.svg.axis()
@@ -39,11 +43,11 @@ $(function() {
       .attr("height", 100)
       .attr("class", "y label")
       .attr("text-anchor", "middle")
-      .attr("x", -height)
+      .attr("x", -height+margin.bottom)
       .attr("y", -margin.left -5)
       .attr("transform", "rotate(-90)")
       .append("xhtml:body")
-      .html("Seasonal Water Use <span style='font-size: 10px;'>(in Millions of Gallons)</span>");
+      .html("Seasonal Water Use <span style='font-size: 10px;'>(in millions of gallons)</span>");
 
     var legend;
 
@@ -54,6 +58,98 @@ $(function() {
       .html(function(d) { return d.value + " Mgal"; });
 
     svg.call(tip0);
+
+       var x1 = d3.time.scale()
+      .range([0, width]);
+
+    var y1 = d3.scale.linear()
+        .range([height, 0]);
+
+    var x1Axis = d3.svg.axis()
+      .scale(x1)
+      .orient("bottom");
+
+    var y1Axis = d3.svg.axis()
+      .tickValues([0,20000,40000])
+      .tickFormat(d3.format("s"))
+      .scale(y1)
+      .orient("right");
+
+    var parseDate = d3.time.format("%Y-%m").parse;
+
+    svg.append("foreignObject")
+      .attr("width", 220)
+      .attr("height", 80)
+      .attr("class", "y label")
+      .attr("text-anchor", "middle")
+      .attr("x", (height/2)-margin.top)
+      .attr("y", -width-65)
+      .attr("transform", "rotate(90)")
+      .append("xhtml:body")
+      .html("Total Flows <span style='font-size: 10px;'>(in cubic feet per second)</span>");
+
+    var line;
+
+    d3.csv("data/flows.csv", function(error, data) {
+
+      data.forEach(function(d) {
+        d.date = parseDate(d.date);
+        d.flow = +d.flow;
+      });
+
+      x1.domain(d3.extent(data, function(d) { return d.date; }));
+      y1.domain([0, 40000]);
+
+      svg.append("g")
+          .attr("class", "y axis")
+          .attr("transform", "translate(" + width + " ,0)")  
+          .call(y1Axis);
+
+      line = d3.svg.line()
+        .interpolate("basis")
+        .x(function(d) { return x1(d.date); })
+        .y(function(d) { return y1(d.flow); });
+
+      line.defined(function(d) { return !isNaN(d.flow); });
+
+      var path = svg.append("path")
+        .datum(data)
+        .attr("class", "line")
+        // .attr("id", "flow-line")
+        .attr("d", line);
+
+      d3.select('path').moveToFront();
+
+      var totalLength = path.node().getTotalLength();
+
+      path
+        .attr("stroke-dasharray", totalLength + " " + totalLength)
+        .attr("stroke-dashoffset", totalLength)
+        .transition()
+        .duration(2000)
+        .ease("linear")
+        .attr("stroke-dashoffset", 0);
+
+      legend = svg.selectAll(".legend")
+          .data(data)
+        .enter().append("g")
+          .attr("class", function(d,i) { return "legend-flows legend-flows-" + i; })
+          .attr("transform", function(d,i) { return "translate("+margin.right+"," + (i+4) * -22  + ")"; });
+
+      legend.append("rect")
+          .attr("x", width - 18)
+          .attr("width", 18)
+          .attr("height", 18)
+          .style("fill", 'steelblue');
+
+      legend.append("text")
+          .attr("x", width - 24)
+          .attr("y", 9)
+          .attr("dy", ".35em")
+          .style("text-anchor", "end")
+          .text('Platte Flows near Ashland, Neb');
+
+    });
 
     d3.csv("data/usage.csv", function(error, data) {
       var seasonNames = d3.keys(data[0]).filter(function(key) { return key !== "Year"; });
@@ -101,7 +197,7 @@ $(function() {
           .data(seasonNames.slice().reverse())
         .enter().append("g")
           .attr("class", "legend")
-          .attr("transform", function(d, i) { return "translate("+margin.right+"," + (i+2) * -22  + ")"; });
+          .attr("transform", function(d, i) { return "translate("+margin.right+"," + (i+4) * -22  + ")"; });
 
       legend.append("rect")
           .attr("x", width - 18)
@@ -116,114 +212,20 @@ $(function() {
           .style("text-anchor", "end")
           .text(function(d) { return d; });
 
-    });
-
-    var x1 = d3.time.scale()
-      .range([0, width]);
-
-    var y1 = d3.scale.linear()
-        .range([height, 0]);
-
-    var x1Axis = d3.svg.axis()
-      .scale(x1)
-      .orient("bottom");
-
-    // var y1Axis = d3.svg.axis()
-    //   .tickValues([0,10000,20000,30000,40000])
-    //   .scale(y1)
-    //   .orient("left");
-
-    var parseDate = d3.time.format("%Y-%m").parse;
-
-    // svg.append("text")
-    //   .attr("class", "y label")
-    //   .attr("text-anchor", "middle")
-    //   .attr("x", -height/2)
-    //   .attr("y", -margin.left+8)
-    //   .attr("transform", "rotate(-90)")
-    //   .text("Total Flows in cubic feet per second");
-
-    var line;
-
-    d3.csv("data/flows.csv", function(error, data) {
-
-      data.forEach(function(d) {
-        d.date = parseDate(d.date);
-        d.flow = +d.flow;
-      });
-
-      x1.domain(d3.extent(data, function(d) { return d.date; }));
-      y1.domain([0, 40000]);
-
-      
-
-      // svg.append("g")
-      //     .attr("class", "x axis")
-      //     .attr("transform", "translate(0," + (height + 10 )+ ")")
-      //     .call(x1Axis);
-
-      // svg.append("g")
-      //     .attr("class", "y axis")
-      //     .call(y1Axis);
-
-      line = d3.svg.line()
-        .interpolate("basis")
-        .x(function(d) { return x1(d.date); })
-        .y(function(d) { return y1(d.flow); });
-
-      line.defined(function(d) { return !isNaN(d.flow); });
-
-      var path = svg.append("path")
-        .datum(data)
-        .attr("class", "line")
-        .attr("d", line);
-
-      var totalLength = path.node().getTotalLength();
-
-      path
-        .attr("stroke-dasharray", totalLength + " " + totalLength)
-        .attr("stroke-dashoffset", totalLength)
-        .transition()
-        .duration(2000)
-        .ease("linear")
-        .attr("stroke-dashoffset", 0);
-
-      legend = svg.selectAll(".legend")
-          .data(data)
-        .enter().append("g")
-          .attr("class", function(d,i) { return "legend-flows legend-flows-" + i; })
-          .attr("transform", function(d,i) { return "translate("+margin.right+"," + (i+2) * -22  + ")"; });
-
-      // legend.append("path")
-      //     .attr({
-      //       d: "M5.2,20.9c1.1-2.8,2.9-6.4,5.9-9.1c3.4-3,8.5-4.1,12.2-4.9",
-      //       stroke: '#000'
-      //     })
-      //     .attr("transform", function(d) { return "translate(886," + -3  + ")"; })
-      //     .attr("class", "line legend");
-
-      legend.append("rect")
-          .attr("x", width - 18)
-          .attr("width", 18)
-          .attr("height", 18)
-          .style("fill", 'steelblue');
-
-      legend.append("text")
-          .attr("x", width - 24)
-          .attr("y", 9)
-          .attr("dy", ".35em")
-          .style("text-anchor", "end")
-          .text('Flow Rates near Ashland NE');
+      d3.select('.line').moveToFront();
 
     });
 
     d3.selection.prototype.moveToFront = function() {
         return this.each(function(){
-            this.parentNode.parentNode.appendChild(this.parentNode);
+            this.parentNode.appendChild(this);
         });
     };
+  };
 
-    d3.select('.line').moveToFront();
+  var pymChild = new pym.Child({ renderCallback: drawGraphic });
+
+  d3.select(window).on('resize', drawGraphic);
 
 });
 
