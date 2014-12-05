@@ -328,7 +328,7 @@ module.exports = function (grunt) {
                     bucket: 'staging.plattebasintimelapse.com'
                 },
                 files: [
-                    {expand: true, cwd: 'dist/', src: ['**'], dest: 'assets/static/pages/lincoln-water//'}
+                    {expand: true, cwd: 'dist/', src: ['**'], dest: 'assets/static/pages/lincoln-water/'}
                 ]
             }
         }

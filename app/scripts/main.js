@@ -134,7 +134,7 @@ $(function() {
           .data(data)
         .enter().append("g")
           .attr("class", function(d,i) { return "legend-flows legend-flows-" + i; })
-          .attr("transform", function(d,i) { return "translate("+margin.right+"," + (i+4) * -22  + ")"; });
+          .attr("transform", function(d,i) { return "translate("+margin.right+"," + (i+2) * -22  + ")"; });
 
       legend.append("rect")
           .attr("x", width - 18)
@@ -197,7 +197,7 @@ $(function() {
           .data(seasonNames.slice().reverse())
         .enter().append("g")
           .attr("class", "legend")
-          .attr("transform", function(d, i) { return "translate("+margin.right+"," + (i+4) * -22  + ")"; });
+          .attr("transform", function(d, i) { return "translate("+margin.right+"," + (i+2) * -22  + ")"; });
 
       legend.append("rect")
           .attr("x", width - 18)
